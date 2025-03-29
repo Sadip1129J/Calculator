@@ -86,7 +86,7 @@ public class MobileCalculator extends Application {
         
         btn0.relocate(10, 430);
         btnDecimal.relocate(90, 430);
-        btnEquals.relocate(170, 430);
+        btnEquals.relocate(170, 430); 
         btnAdd.relocate(250, 430);
 
         // Create the main pane
@@ -122,20 +122,13 @@ public class MobileCalculator extends Application {
     private void handleButtonClick(String text) {
         switch (text) {
             case "C": // Clear All
-                currentNumber = "";
-                operator = "";
-                firstOperand = 0;
-                startNewNumber = true;
-                currentExpression = "";
-                display.setText("");
-                historyDisplay.setText("");
+                clearCalculator();
                 break;
                 
             case "DEL": // Delete last character
                 if (!currentNumber.isEmpty()) {
                     currentNumber = currentNumber.substring(0, currentNumber.length() - 1);
                     display.setText(currentNumber);
-                    updateHistoryDisplay();
                 }
                 break;
                 
@@ -143,55 +136,79 @@ public class MobileCalculator extends Application {
             case "-":
             case "*":
             case "/":
-                if (!currentNumber.isEmpty()) {
-                    if (operator.isEmpty()) {
-                        firstOperand = Double.parseDouble(currentNumber);
-                        currentExpression = currentNumber + " " + text;
-                    } else {
-                        double result = performOperation(firstOperand, Double.parseDouble(currentNumber), operator);
-                        firstOperand = result;
-                        currentExpression = result + " " + text;
-                    }
-                    operator = text;
-                    currentNumber = "";
-                    startNewNumber = true;
-                    display.setText("");
-                    historyDisplay.setText(currentExpression);
-                }
+                handleOperator(text);
                 break;
                 
             case "=":
-                if (!currentNumber.isEmpty() && !operator.isEmpty()) {
-                    double secondOperand = Double.parseDouble(currentNumber);
-                    double result = performOperation(firstOperand, secondOperand, operator);
-                    currentExpression = firstOperand + " " + operator + " " + currentNumber + " =";
-                    historyDisplay.setText(currentExpression);
-                    display.setText(String.valueOf(result));
-                    currentNumber = String.valueOf(result);
-                    operator = "";
-                    startNewNumber = true;
-                }
+                calculateResult();
                 break;
                 
             default: // Number or decimal point
-                if (startNewNumber) {
-                    currentNumber = text;
-                    startNewNumber = false;
-                } else {
-                    currentNumber += text;
-                }
-                display.setText(currentNumber);
-                updateHistoryDisplay();
+                handleNumberInput(text);
                 break;
         }
     }
 
-    private void updateHistoryDisplay() {
-        if (!operator.isEmpty()) {
-            historyDisplay.setText(firstOperand + " " + operator);
-        } else {
-            historyDisplay.setText("");
+    private void clearCalculator() {
+        currentNumber = "";
+        operator = "";
+        firstOperand = 0;
+        startNewNumber = true;
+        currentExpression = "";
+        display.setText("");
+        historyDisplay.setText("");
+    }
+
+    private void handleOperator(String text) {
+        if (!currentNumber.isEmpty()) {
+            if (operator.isEmpty()) {
+                firstOperand = Double.parseDouble(currentNumber);
+                currentExpression = currentNumber + " " + text;
+            } else {
+                double result = performOperation(firstOperand, Double.parseDouble(currentNumber), operator);
+                if (Double.isNaN(result)) {
+                    display.setText("Error");
+                    return;
+                }
+                firstOperand = result;
+                currentExpression = result + " " + text;
+            }
+            operator = text;
+            currentNumber = "";
+            startNewNumber = true;
+            display.setText("");
+            historyDisplay.setText(currentExpression);
         }
+    }
+
+    private void calculateResult() {
+        if (!currentNumber.isEmpty() && !operator.isEmpty()) {
+            double secondOperand = Double.parseDouble(currentNumber);
+            double result = performOperation(firstOperand, secondOperand, operator);
+            if (Double.isNaN(result)) {
+                display.setText("Error");
+                return;
+            }
+            currentExpression = firstOperand + " " + operator + " " + currentNumber + " = " + result;
+            historyDisplay.setText(currentExpression);
+            display.setText(String.valueOf(result));
+            currentNumber = String.valueOf(result);
+            operator = "";
+            startNewNumber = true;
+        }
+    }
+
+    private void handleNumberInput(String text) {
+        if (text.equals(".") && currentNumber.contains(".")) {
+            return; // Prevent multiple decimal points
+        }
+        if (startNewNumber) {
+            currentNumber = text;
+            startNewNumber = false;
+        } else {
+            currentNumber += text;
+        }
+        display.setText(currentNumber);
     }
 
     private double performOperation(double first, double second, String operator) {
@@ -207,7 +224,7 @@ public class MobileCalculator extends Application {
                     return first / second;
                 } else {
                     display.setText("Error");
-                    return 0;
+                    return Double.NaN; // Return NaN for division by zero
                 }
             default:
                 return 0;
