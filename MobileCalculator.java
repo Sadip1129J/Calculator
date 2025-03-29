@@ -1,12 +1,11 @@
 package calculator;
+
 import javafx.application.Application;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
 public class MobileCalculator extends Application {
@@ -24,87 +23,80 @@ public class MobileCalculator extends Application {
         // Create the display
         display = new TextField();
         display.setEditable(false);
-        display.setPrefHeight(50);
+        display.setPrefHeight(60);
         display.setAlignment(Pos.CENTER_RIGHT);
         display.setFont(javafx.scene.text.Font.font("Arial", 24));
         display.setStyle("-fx-background-color: #FFFFFF; -fx-text-fill: #000000;");
+        display.relocate(10, 10);
+        display.setPrefWidth(280);
 
-        // Create a grid for buttons
-        GridPane buttonGrid = new GridPane();
-        buttonGrid.setHgap(10);
-        buttonGrid.setVgap(10);
-        buttonGrid.setPadding(new Insets(10));
+        // Create buttons
+        Button btnClear = createButton("C");
+        Button btnDelete = createButton("DEL");
+        
+        Button btn7 = createButton("7");
+        Button btn8 = createButton("8");
+        Button btn9 = createButton("9");
+        Button btnDivide = createButton("/");
+        
+        Button btn4 = createButton("4");
+        Button btn5 = createButton("5");
+        Button btn6 = createButton("6");
+        Button btnMultiply = createButton("*");
+        
+        Button btn1 = createButton("1");
+        Button btn2 = createButton("2");
+        Button btn3 = createButton("3");
+        Button btnSubtract = createButton("-");
+        
+        Button btn0 = createButton("0");
+        Button btnDecimal = createButton(".");
+        Button btnEquals = createButton("=");
+        Button btnAdd = createButton("+");
 
-        // Button labels
-        String[] buttonLabels = {
-            "7", "8", "9", "/",
-            "4", "5", "6", "*",
-            "1", "2", "3", "-",
-            "0", ".", "DEL", "C",
-            "", "", "=", "+" // Adding empty strings for spacing
-        };
+        // Position buttons using relocate()
+        // Clear and Delete buttons below textbox
+        btnClear.relocate(10, 80);
+        btnDelete.relocate(90, 80);
+        
+        // Number and operator buttons
+        btn7.relocate(10, 160);
+        btn8.relocate(90, 160);
+        btn9.relocate(170, 160);
+        btnDivide.relocate(250, 160);
+        
+        btn4.relocate(10, 240);
+        btn5.relocate(90, 240);
+        btn6.relocate(170, 240);
+        btnMultiply.relocate(250, 240);
+        
+        btn1.relocate(10, 320);
+        btn2.relocate(90, 320);
+        btn3.relocate(170, 320);
+        btnSubtract.relocate(250, 320);
+        
+        btn0.relocate(10, 400);
+        btnDecimal.relocate(90, 400);
+        btnEquals.relocate(170, 400);
+        btnAdd.relocate(250, 400);
 
-        // Create buttons and add them to the grid
-        int row = 0;
-        int col = 0;
-        for (String label : buttonLabels) {
-            if (!label.isEmpty()) { // Only add non-empty labels
-                Button button = createButton(label);
-                buttonGrid.add(button, col, row);
-                col++;
-                if (col > 3) {
-                    col = 0;
-                    row++;
-                }
-            }
-        }
-
-        // Create a vertical box to hold the display and button grid
-        VBox root = new VBox(10, display, buttonGrid);
-        root.setPadding(new Insets(10));
-        root.setAlignment(Pos.CENTER);
-        root.setStyle("-fx-background-color: #2E2E2E;"); // Set background color to light black
-
-        // Create a new grid for the top buttons (C and DEL)
-        GridPane topButtonGrid = new GridPane();
-        topButtonGrid.setHgap(10);
-        topButtonGrid.setVgap(10);
-        topButtonGrid.setPadding(new Insets(10));
-        topButtonGrid.add(createButton("C"), 0, 0);
-        topButtonGrid.add(createButton("DEL"), 1, 0);
-
-        // Create a new grid for the bottom buttons (numbers and operators)
-        GridPane bottomButtonGrid = new GridPane();
-        bottomButtonGrid.setHgap(10);
-        bottomButtonGrid.setVgap(10);
-        bottomButtonGrid.setPadding(new Insets(10));
-
-        // Add number and operator buttons to the bottom grid
-        row = 0;
-        col = 0;
-        for (String label : buttonLabels) {
-            if (!label.isEmpty() && !label.equals("C") && !label.equals("DEL") && !label.equals("=")) {
-                Button button = createButton(label);
-                bottomButtonGrid.add(button, col, row);
-                col++;
-                if (col > 3) {
-                    col = 0;
-                    row++;
-                }
-            }
-        }
-
-        // Add the "=" button to the bottom right
-        bottomButtonGrid.add(createButton("="), 3, row);
-
-        // Create a vertical box to hold the display, top buttons, and bottom buttons
-        VBox mainLayout = new VBox(10, display, topButtonGrid, bottomButtonGrid);
-        mainLayout.setPadding(new Insets(10));
-        mainLayout.setAlignment(Pos.CENTER);
-        mainLayout.setStyle("-fx-background-color: #2E2E2E;"); // Set background color to light black
+        // Create the main pane
+        Pane pane = new Pane();
+        pane.setStyle("-fx-background-color: #2E2E2E;");
+        pane.setPrefSize(330, 500);
+        
+        // Add all components to the pane
+        pane.getChildren().add(display);
+        pane.getChildren().addAll(
+            btnClear, btnDelete,
+            btn7, btn8, btn9, btnDivide,
+            btn4, btn5, btn6, btnMultiply,
+            btn1, btn2, btn3, btnSubtract,
+            btn0, btnDecimal, btnEquals, btnAdd
+        );
 
         // Set the scene and show the stage
-        Scene scene = new Scene(mainLayout, 300, 500);
+        Scene scene = new Scene(pane);
         primaryStage.setScene(scene);
         primaryStage.show();
     }
@@ -112,7 +104,8 @@ public class MobileCalculator extends Application {
     private Button createButton(String text) {
         Button button = new Button(text);
         button.setPrefSize(70, 70);
-        button.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 20px; -fx-border-radius: 10; -fx-background-radius: 10;");
+        button.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 20px; " +
+                       "-fx-border-radius: 10; -fx-background-radius: 10;");
         button.setOnAction(e -> handleButtonClick(text));
         return button;
     }
